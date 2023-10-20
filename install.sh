@@ -13,7 +13,10 @@ cd "${MLD_SCRIPT_DIR}"
 # Helpers
 function LOG {
     echo -e "\033[35m\033[1m[LOG] ${1}\033[0m\n"
-    set +e
+}
+function ERROR {
+    echo -e "\033[0;31m\033[1m[ERROR] ${1}\033[0m\n"
+    exit 1
 }
 # --Helpers
 
@@ -31,27 +34,30 @@ function check_privileges {
 
 function init_script {
     # Install packages dependencies
-    sudo pacman -S --needed --noconfirm git rustup flatpak ||
-        LOG "Unable to install required dependencies"
+    if [[ ! -x "$(command -v git)" || ! -x "$(command -v rustup)" || ! -x "$(command -v flatpak)" ]]; then
+        sudo pacman -S --needed --noconfirm git rustup flatpak ||
+            ERROR "Unable to install required dependencies"
+    fi
 
     # Init rustup
     if [[ ! $(rustup toolchain list) =~ "stable" ]]; then
-        rustup install stable || LOG "Unable to configure rustup"
+        rustup install stable || ERROR "Unable to configure rustup"
     fi
     if [[ -z "$(rustup default)" ]]; then
-        rustup default stable || LOG "Unable to configure rustup"
+        rustup default stable || ERROR "Unable to configure rustup"
     fi
 
     # Install paru
     if [[ ! -x "$(command -v paru)" ]]; then
         git clone https://aur.archlinux.org/paru.git "${MLD_SCRIPT_DIR}/paru" &&
             cd "${MLD_SCRIPT_DIR}/paru" && makepkg -si --noconfirm --needed ||
-            LOG "Unable to install paru"
+            ERROR "Unable to install paru"
         rm -r "${MLD_SCRIPT_DIR}/paru"
     fi
 
     # Init flatpak
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo ||
+        ERROR "Unable to configure flatpak"
 }
 
 function install_packages {
@@ -93,10 +99,6 @@ function install_packages {
                 LOG "Unable to remove flatpak '${_package}'"
         done
     )
-}
-
-function post_install() {
-    source "${MLD_POST_INSTALL_SCRIPT_PATH}"
 }
 
 check_privileges
