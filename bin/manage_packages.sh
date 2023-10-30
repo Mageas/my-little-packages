@@ -198,7 +198,9 @@ function indexing_cache {
 
 indexing_packages
 indexing_cache
-save_indexing_cache
+if [[ "${1}" = true ]]; then
+    save_indexing_cache
+fi
 
 # Calculate the regular packages to be removed and installed
 # MLD_OUTPUT_PACKAGES_REMOVE will store the regular packages to be removed

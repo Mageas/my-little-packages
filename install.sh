@@ -101,6 +101,13 @@ function install_packages {
     )
 }
 
+function save_packages {
+    set +e
+    source "${MLD_MANAGE_PACKAGES_SCRIPT_PATH}" true
+    set -e
+}
+
 check_privileges
 init_script
 install_packages
+save_packages
