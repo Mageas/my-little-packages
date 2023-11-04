@@ -69,34 +69,34 @@ function install_packages {
         # Install pacman packages
         if [[ "${MLD_OUTPUT_PACKAGES_INSTALL[@]}" != "" ]]; then
             sudo pacman -S --needed --noconfirm ${MLD_OUTPUT_PACKAGES_INSTALL[@]} ||
-                LOG "Unable to install pacman '${MLD_OUTPUT_PACKAGES_INSTALL[@]}'"
+                ERROR "Unable to install pacman '${MLD_OUTPUT_PACKAGES_INSTALL[@]}'"
         fi
         # Remove pacman packages
         if [[ "${MLD_OUTPUT_PACKAGES_REMOVE[@]}" != "" ]]; then
             sudo pacman -Rcns ${MLD_OUTPUT_PACKAGES_REMOVE[@]} ||
-                LOG "Unable to remove pacman '${MLD_OUTPUT_PACKAGES_REMOVE[@]}'"
+                ERROR "Unable to remove pacman '${MLD_OUTPUT_PACKAGES_REMOVE[@]}'"
         fi
 
         # Install aur packages
         for _package in ${MLD_OUTPUT_AUR_PACKAGES_INSTALL[@]}; do
             paru -S --noconfirm --noprovides --skipreview "${_package}" ||
-                LOG "Unable to install aur '${_package}'"
+                ERROR "Unable to install aur '${_package}'"
         done
         # Remove aur packages
         for _package in ${MLD_OUTPUT_AUR_PACKAGES_REMOVE[@]}; do
             paru -Rcns --noconfirm "${_package}" ||
-                LOG "Unable to remove aur '${_package}'"
+                ERROR "Unable to remove aur '${_package}'"
         done
 
         # Install flatpaks
         for _package in ${MLD_OUTPUT_FLATPAKS_INSTALL[@]}; do
             flatpak install -y "${_package}" ||
-                LOG "Unable to install flatpak '${_package}'"
+                ERROR "Unable to install flatpak '${_package}'"
         done
         # Remove flatpaks
         for _package in ${MLD_OUTPUT_FLATPAKS_REMOVE[@]}; do
             flatpak uninstall -y "${_package}" ||
-                LOG "Unable to remove flatpak '${_package}'"
+                ERROR "Unable to remove flatpak '${_package}'"
         done
     )
 }
